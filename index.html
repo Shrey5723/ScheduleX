@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScheduleX — CPU Scheduling Simulator</title>
+    <!-- Use Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="header">
+            <div class="header-left">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--accent)" stroke-width="1.5">
+                    <rect x="6" y="6" width="16" height="16" rx="2" />
+                    <!-- Pins top -->
+                    <line x1="8" y1="2" x2="8" y2="6"/><line x1="11" y1="2" x2="11" y2="6"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="17" y1="2" x2="17" y2="6"/><line x1="20" y1="2" x2="20" y2="6"/>
+                    <!-- Pins bottom -->
+                    <line x1="8" y1="22" x2="8" y2="26"/><line x1="11" y1="22" x2="11" y2="26"/><line x1="14" y1="22" x2="14" y2="26"/><line x1="17" y1="22" x2="17" y2="26"/><line x1="20" y1="22" x2="20" y2="26"/>
+                    <!-- Pins left -->
+                    <line x1="2" y1="8" x2="6" y2="8"/><line x1="2" y1="11" x2="6" y2="11"/><line x1="2" y1="14" x2="6" y2="14"/><line x1="2" y1="17" x2="6" y2="17"/><line x1="2" y1="20" x2="6" y2="20"/>
+                    <!-- Pins right -->
+                    <line x1="22" y1="8" x2="26" y2="8"/><line x1="22" y1="11" x2="26" y2="11"/><line x1="22" y1="14" x2="26" y2="14"/><line x1="22" y1="17" x2="26" y2="17"/><line x1="22" y1="20" x2="26" y2="20"/>
+                    <!-- Inner chart -->
+                    <line x1="10" y1="18" x2="10" y2="12"/><line x1="14" y1="18" x2="14" y2="10"/><line x1="18" y1="18" x2="18" y2="14"/>
+                </svg>
+                <div>
+                    <div class="logo-title">ScheduleX</div>
+                    <div class="logo-subtitle">CPU Scheduling Simulator</div>
+                </div>
+            </div>
+            <div class="header-center">
+                <div id="hdr-algo">First Come First Serve</div>
+                <div class="hdr-status">
+                    <div id="hdr-status-dot"></div>
+                    <span id="hdr-status-label">Idle</span>
+                </div>
+                <div id="hdr-time">T = 0</div>
+                <div id="current-time-display" class="d-none">0</div>
+                <div id="sim-status-badge" class="d-none"></div>
+            </div>
+            <div class="header-right">
+                <div id="hdr-proc-count">0 processes</div>
+                <div class="hdr-hint">Space · start/pause</div>
+            </div>
+        </div>
+
+        <div id="content-row">
+            <!-- LEFT PANEL -->
+            <div class="sidebar-left">
+                <section class="card">
+                    <div class="card-header"><span class="section-label">Configuration</span></div>
+                    <div class="form-group flex-between">
+                        <label>Load Preset</label>
+                        <select id="preset-dropdown">
+                            <option value="">-- Custom --</option>
+                            <option value="simple">Simple 4-Process Set</option>
+                            <option value="priority">Priority Stress Test</option>
+                            <option value="rr">Round Robin Demo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group flex-between mt-sm">
+                        <label>Algorithm</label>
+                        <select id="algorithm-select">
+                            <option value="fcfs">First Come First Serve (FCFS)</option>
+                            <option value="sjf">Shortest Job First (SJF)</option>
+                            <option value="srtf">Shortest Remaining Time First (SRTF)</option>
+                            <option value="rr">Round Robin (RR)</option>
+                            <option value="priority">Priority (Non-Preemptive)</option>
+                            <option value="priorityPreemptive">Priority (Preemptive)</option>
+                            <option value="mlq">Multi-Level Queue (MLQ)</option>
+                            <option value="mlfq">Multi-Level Feedback Queue (MLFQ)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group d-none mt-sm" id="quantum-group">
+                        <label>Time Quantum</label>
+                        <input type="number" id="time-quantum" value="2" min="1">
+                        <span class="error-msg">Quantum must be ≥ 1.</span>
+                    </div>
+
+                    <div class="form-row d-none mt-sm" id="mlfq-quantums-group">
+                        <div class="form-group">
+                            <label>Q1 (High)</label>
+                            <input type="number" id="mlfq-q1" value="2" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Q2 (Mid)</label>
+                            <input type="number" id="mlfq-q2" value="4" min="1">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header"><span class="section-label">Add Process</span></div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>PID</label>
+                            <input type="text" id="proc-id" placeholder="P1">
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <input type="number" id="proc-priority" value="1" min="1" max="10">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Arrival</label>
+                            <input type="number" id="proc-arrival" value="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Burst</label>
+                            <input type="number" id="proc-burst" value="1" min="1">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="btn-add-process" style="width: 100%; margin-top: 4px;">Append Process</button>
+                    <span id="process-error" class="error-msg text-center mt-sm"></span>
+                </section>
+
+                <section class="card" style="margin-bottom: 0;">
+                    <div class="card-header">
+                        <span class="section-label">Processes</span>
+                        <div class="btn-group-tight">
+                            <button class="btn btn-secondary" style="padding: 4px 6px; font-size: 10px;" id="btn-import-json">Import</button>
+                            <button class="btn btn-secondary" style="padding: 4px 6px; font-size: 10px;" id="btn-export-json">Export</button>
+                            <input type="file" id="file-import" accept="application/json" class="d-none">
+                        </div>
+                    </div>
+                    <table class="process-table">
+                        <thead>
+                            <tr>
+                                <th>PID</th>
+                                <th>ARV</th>
+                                <th>BST</th>
+                                <th>PRY</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="process-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <div class="resize-handle" data-side="left"></div>
+
+            <!-- CENTER PANEL -->
+            <div class="center-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="section-label">Execution Timeline</span>
+                        <button class="btn btn-secondary" id="btn-export-png" style="padding: 4px 8px; font-size: 11px;">Export PNG</button>
+                    </div>
+                    <div class="gantt-wrapper">
+                        <div class="gantt-container" id="gantt-container"></div>
+                        <div class="gantt-timeline" id="gantt-timeline"></div>
+                        <div class="gantt-tooltip" id="gantt-tooltip"></div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-header">
+                        <span class="section-label">Per-Process Analytical Breakdown</span>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="process-table" style="font-size: 11px;">
+                            <thead>
+                                <tr>
+                                    <th>PID</th>
+                                    <th>Arrival</th>
+                                    <th>Burst</th>
+                                    <th>Start</th>
+                                    <th>Finish</th>
+                                    <th>Wait</th>
+                                    <th>Turnaround</th>
+                                    <th>Resp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="breakdown-table-body">
+                                <!-- Populated randomly by metrics.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resize-handle" data-side="right"></div>
+
+            <!-- RIGHT PANEL -->
+            <div class="sidebar-right">
+                <section class="card">
+                    <div class="card-header"><span class="section-label">Simulation Core</span></div>
+                    <div class="btn-group" style="display: flex; gap: 6px; margin-bottom: 12px;">
+                        <button class="btn btn-primary" id="btn-start" style="flex: 1;">Start</button>
+                        <button class="btn btn-secondary" id="btn-step" style="flex: 1;" disabled>Step</button>
+                        <button class="btn btn-danger" id="btn-reset" style="flex: 1;">Reset</button>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="flex-between">
+                            <span>Simulation Speed</span>
+                            <span id="speed-label" class="font-mono text-muted" style="font-family: 'Fira Code', monospace;">Normal</span>
+                        </label>
+                        <input type="range" id="speed-slider" min="0" max="3" step="1" value="1">
+                        <div class="flex-between text-muted" style="font-size: 10px; margin-top: 4px; font-weight: 500;">
+                            <span>Slow</span>
+                            <span>Normal</span>
+                            <span>Fast</span>
+                            <span>Inst.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header"><span class="section-label">Live Ready Queue</span></div>
+                    <div class="queue-container" id="ready-queue-container">
+                        <div class="text-muted" style="margin: auto; font-size: 11px;">Queue is empty</div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header"><span class="section-label">Metrics Overview</span></div>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value" id="metric-avg-wait">0.0</div>
+                            <div class="metric-label">Avg Wait</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="metric-avg-turnaround">0.0</div>
+                            <div class="metric-label">Avg Turn</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="metric-avg-response">0.0</div>
+                            <div class="metric-label">Avg Resp</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="metric-throughput">0.0</div>
+                            <div class="metric-label">Thru/put</div>
+                        </div>
+                        <div class="metric-card" style="grid-column: span 2;">
+                            <div class="metric-value" id="metric-cpu-util">0.0%</div>
+                            <div class="metric-label">CPU Utilization</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card" style="margin-bottom: 0;">
+                    <div class="card-header">
+                        <span class="section-label">Comparison</span>
+                        <div class="btn-group-tight">
+                            <button class="btn btn-secondary" id="btn-clear-history" style="padding: 4px 6px; font-size: 10px;">Clear</button>
+                            <button class="btn btn-secondary" id="btn-export-csv" style="padding: 4px 6px; font-size: 10px;">CSV</button>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="comparison-table" id="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">Algo</th>
+                                    <th>Wait</th>
+                                    <th>Turn</th>
+                                    <th>Resp</th>
+                                    <th>Util</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparison-table-body">
+                                <!-- Comparisons inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
