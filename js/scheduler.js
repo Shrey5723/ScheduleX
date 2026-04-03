@@ -71,8 +71,8 @@ export class Scheduler {
             p.turnaroundTime = 0;
             p.waitingTime = 0;
             p.responseTime = -1;
-            if(p.mlfqLevel) p.mlfqLevel = undefined;
-            if(p.queueLevel) p.queueLevel = undefined;
+            delete p.mlfqLevel;
+            delete p.queueLevel;
         });
 
         if (this.algorithm && this.algorithm._reset) {

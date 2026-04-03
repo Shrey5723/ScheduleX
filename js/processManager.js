@@ -8,28 +8,56 @@ export class ProcessManager {
         this.processes = [];
         this.pidCounter = 1;
 
-        // Built-in presets
+        // Built-in presets designed to best demonstrate each algorithm
         this.presets = {
-            simple: [
+            fcfs: [
+                { pid: 'P1', arrivalTime: 0, burstTime: 8, priority: 1, status: 'Waiting' },
+                { pid: 'P2', arrivalTime: 1, burstTime: 4, priority: 1, status: 'Waiting' },
+                { pid: 'P3', arrivalTime: 2, burstTime: 9, priority: 1, status: 'Waiting' },
+                { pid: 'P4', arrivalTime: 3, burstTime: 5, priority: 1, status: 'Waiting' }
+            ],
+            sjf: [
+                { pid: 'P1', arrivalTime: 0, burstTime: 7, priority: 1, status: 'Waiting' },
+                { pid: 'P2', arrivalTime: 2, burstTime: 4, priority: 1, status: 'Waiting' },
+                { pid: 'P3', arrivalTime: 4, burstTime: 1, priority: 1, status: 'Waiting' },
+                { pid: 'P4', arrivalTime: 5, burstTime: 4, priority: 1, status: 'Waiting' }
+            ],
+            srtf: [
+                { pid: 'P1', arrivalTime: 0, burstTime: 8, priority: 1, status: 'Waiting' },
+                { pid: 'P2', arrivalTime: 1, burstTime: 4, priority: 1, status: 'Waiting' },
+                { pid: 'P3', arrivalTime: 2, burstTime: 2, priority: 1, status: 'Waiting' },
+                { pid: 'P4', arrivalTime: 3, burstTime: 5, priority: 1, status: 'Waiting' }
+            ],
+            rr: [
                 { pid: 'P1', arrivalTime: 0, burstTime: 5, priority: 1, status: 'Waiting' },
-                { pid: 'P2', arrivalTime: 1, burstTime: 3, priority: 2, status: 'Waiting' },
-                { pid: 'P3', arrivalTime: 2, burstTime: 8, priority: 1, status: 'Waiting' },
-                { pid: 'P4', arrivalTime: 3, burstTime: 6, priority: 3, status: 'Waiting' }
+                { pid: 'P2', arrivalTime: 1, burstTime: 6, priority: 1, status: 'Waiting' },
+                { pid: 'P3', arrivalTime: 2, burstTime: 3, priority: 1, status: 'Waiting' },
+                { pid: 'P4', arrivalTime: 3, burstTime: 1, priority: 1, status: 'Waiting' },
+                { pid: 'P5', arrivalTime: 4, burstTime: 5, priority: 1, status: 'Waiting' }
             ],
             priority: [
                 { pid: 'P1', arrivalTime: 0, burstTime: 10, priority: 3, status: 'Waiting' },
-                { pid: 'P2', arrivalTime: 0, burstTime: 1, priority: 1, status: 'Waiting' },
-                { pid: 'P3', arrivalTime: 0, burstTime: 2, priority: 4, status: 'Waiting' },
-                { pid: 'P4', arrivalTime: 0, burstTime: 1, priority: 5, status: 'Waiting' },
-                { pid: 'P5', arrivalTime: 0, burstTime: 5, priority: 2, status: 'Waiting' }
+                { pid: 'P2', arrivalTime: 1, burstTime: 1, priority: 1, status: 'Waiting' },
+                { pid: 'P3', arrivalTime: 2, burstTime: 2, priority: 4, status: 'Waiting' },
+                { pid: 'P4', arrivalTime: 3, burstTime: 1, priority: 5, status: 'Waiting' },
+                { pid: 'P5', arrivalTime: 4, burstTime: 5, priority: 2, status: 'Waiting' }
             ],
-            rr: [
-                { pid: 'P1', arrivalTime: 0, burstTime: 4, priority: 1, status: 'Waiting' },
-                { pid: 'P2', arrivalTime: 1, burstTime: 5, priority: 1, status: 'Waiting' },
-                { pid: 'P3', arrivalTime: 2, burstTime: 2, priority: 1, status: 'Waiting' },
-                { pid: 'P4', arrivalTime: 3, burstTime: 1, priority: 1, status: 'Waiting' },
-                { pid: 'P5', arrivalTime: 4, burstTime: 6, priority: 1, status: 'Waiting' },
-                { pid: 'P6', arrivalTime: 6, burstTime: 3, priority: 1, status: 'Waiting' }
+            priorityPreemptive: [
+                { pid: 'P1', arrivalTime: 0, burstTime: 6, priority: 4, status: 'Waiting' },
+                { pid: 'P2', arrivalTime: 2, burstTime: 4, priority: 2, status: 'Waiting' },
+                { pid: 'P3', arrivalTime: 3, burstTime: 2, priority: 1, status: 'Waiting' },
+                { pid: 'P4', arrivalTime: 6, burstTime: 3, priority: 3, status: 'Waiting' }
+            ],
+            mlq: [
+                { pid: 'P1', arrivalTime: 0, burstTime: 10, priority: 9, status: 'Waiting' }, // Level 3
+                { pid: 'P2', arrivalTime: 2, burstTime: 5, priority: 5, status: 'Waiting' },  // Level 2 (preempts)
+                { pid: 'P3', arrivalTime: 4, burstTime: 3, priority: 2, status: 'Waiting' },  // Level 1 (preempts)
+                { pid: 'P4', arrivalTime: 5, burstTime: 2, priority: 1, status: 'Waiting' }   // Level 1
+            ],
+            mlfq: [
+                { pid: 'P1', arrivalTime: 0, burstTime: 8, priority: 1, status: 'Waiting' },  // Will demote twice
+                { pid: 'P2', arrivalTime: 1, burstTime: 5, priority: 1, status: 'Waiting' },  // Will demote once
+                { pid: 'P3', arrivalTime: 5, burstTime: 2, priority: 1, status: 'Waiting' }   // Completes in first queue
             ]
         };
     }
