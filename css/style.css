@@ -3,17 +3,17 @@
 
 :root {
   /* App shell */
-  --bg-app:        #F5F5F7;
+  --bg-app:        #FDF8F5;
   --bg-panel:      #FFFFFF;
   --bg-surface:    #FAFAFA;
-  --bg-hover:      rgba(91, 91, 214, 0.05);
-  --bg-active:     rgba(91, 91, 214, 0.09);
+  --bg-hover:      rgba(249, 115, 22, 0.05);
+  --bg-active:     rgba(249, 115, 22, 0.09);
 
-  /* Accent (indigo-purple) */
-  --accent:        #5B5BD6;
-  --accent-hover:  #4E4EC2;
-  --accent-muted:  rgba(91, 91, 214, 0.12);
-  --accent-text:   #4747B0;
+  /* Accent (orange) */
+  --accent:        #F97316;
+  --accent-hover:  #EA580C;
+  --accent-muted:  rgba(249, 115, 22, 0.12);
+  --accent-text:   #C2410C;
 
   /* Text */
   --text-primary:   #0D0D0D;
@@ -24,7 +24,7 @@
   /* Borders */
   --border:        rgba(0, 0, 0, 0.08);
   --border-strong: rgba(0, 0, 0, 0.14);
-  --border-accent: rgba(91, 91, 214, 0.35);
+  --border-accent: rgba(249, 115, 22, 0.35);
 
   /* Semantic */
   --success:       #12A150;
